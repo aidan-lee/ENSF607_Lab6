@@ -9,10 +9,13 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
-    private Socket socket;
+    private Socket socket1;
+    private Socket socket2;
     private ServerSocket serverSocket;
-    private PrintWriter socketOut;
-    private BufferedReader socketIn;
+    private PrintWriter socketOut1;
+    private BufferedReader socketIn1;
+    private PrintWriter socketOut2;
+    private BufferedReader socketIn2;
 
     private ExecutorService pool;
 
@@ -30,11 +33,15 @@ public class Server {
 
         try {
             while (true) {
-                socket = serverSocket.accept();
+                socket1 = serverSocket.accept();
                 System.out.println("Console at Server side says: Connection accepted by the server!");
-                socketIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                socketOut = new PrintWriter(socket.getOutputStream(), true);
-                Game game = new Game(socketOut, socketIn);
+                socketIn1 = new BufferedReader(new InputStreamReader(socket1.getInputStream()));
+                socketOut1 = new PrintWriter(socket1.getOutputStream(), true);
+
+                socket2 = serverSocket.accept();
+                socketIn2 = new BufferedReader(new InputStreamReader(socket2.getInputStream()));
+                socketOut2 = new PrintWriter(socket2.getOutputStream(), true);
+                Game game = new Game(socketOut1, socketIn1, socketOut2, socketIn2);
                 pool.execute(game);
 
 
@@ -45,8 +52,10 @@ public class Server {
         }
         pool.shutdown();
         try {
-            socketIn.close();
-            socketOut.close();
+            socketIn1.close();
+            socketOut1.close();
+            socketIn2.close();
+            socketOut2.close();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

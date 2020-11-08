@@ -20,17 +20,20 @@ public class Game implements Constants, Runnable {
 
 	BufferedReader stdin;
 
-	private PrintWriter socketOut;
-	private BufferedReader socketIn;
-
+	private PrintWriter socketOut1;
+	private BufferedReader socketIn1;
+	private PrintWriter socketOut2;
+	private BufferedReader socketIn2;
 
 	/**
 	 * A constructor for Game objects
 	 */
-    public Game(PrintWriter socketOut, BufferedReader socketIn) {
+    public Game(PrintWriter socketOut1, BufferedReader socketIn1, PrintWriter socketOut2, BufferedReader socketIn2) {
         theBoard  = new Board();
-		this.socketIn = socketIn;
-		this.socketOut = socketOut;
+		this.socketIn1 = socketIn1;
+		this.socketOut1 = socketOut1;
+		this.socketIn2 = socketIn2;
+		this.socketOut2 = socketOut2;
 //		stdin = new BufferedReader(new InputStreamReader(System.in));
 
 
@@ -55,25 +58,25 @@ public class Game implements Constants, Runnable {
     	try {
 			Referee theRef;
 			Player xPlayer, oPlayer;
-			socketOut.println("Please enter the name of the \'X\' player:");
-			String name= socketIn.readLine();
+			socketOut1.println("Please enter the name of the \'X\' player:");
+			String name= socketIn1.readLine();
 			System.out.println("received " + name);
 			while (name == null) {
-				socketOut.print("Please try again: ");
-				name = socketIn.readLine();
+				socketOut1.print("Please try again: ");
+				name = socketIn1.readLine();
 			}
 
-			xPlayer = new Player(name, LETTER_X, socketOut, socketIn);
+			xPlayer = new Player(name, LETTER_X, socketOut1, socketIn1);
 			xPlayer.setBoard(this.theBoard);
 
-			socketOut.println("Please enter the name of the \'O\' player:");
-			name = socketIn.readLine();
+			socketOut2.println("Please enter the name of the \'O\' player:");
+			name = socketIn2.readLine();
 			while (name == null) {
-				socketOut.print("Please try again: ");
-				name = socketIn.readLine();
+				socketOut2.print("Please try again: ");
+				name = socketIn2.readLine();
 			}
 
-			oPlayer = new Player(name, LETTER_O, socketOut, socketIn);
+			oPlayer = new Player(name, LETTER_O, socketOut2, socketIn2);
 			oPlayer.setBoard(this.theBoard);
 
 			theRef = new Referee();
@@ -82,6 +85,11 @@ public class Game implements Constants, Runnable {
 			theRef.setxPlayer(xPlayer);
 
 			this.appointReferee(theRef);
+
+			socketOut1.println("Thank you for playing");
+			socketOut2.println("Thank you for playing");
+
+
 		}
 		catch (IOException e) {
     		e.printStackTrace();

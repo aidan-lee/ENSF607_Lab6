@@ -48,15 +48,24 @@ public class Player {
      * If neither have occurred, it passes the turn to the opposing player.
      */
     public void play() {
-
-        makeMove();
+//        socketOut.println("play for player " + name + Constants.delimiter);
+//        System.out.println("\"play for player \" + name + Constants.delimiter");
         board.display(socketOut);
+        makeMove();
 
+//        board.display();
+
+
+        PrintWriter opponentSocket = opponent.getSocketOut();
+        // send messages to other player too
         if (board.isFull()) {
-            socketOut.println("The board is full, the game is over. It was a tie!");
+            socketOut.println("The board is full, the game is over. It was a tie!" + Constants.delimiter);
+            opponentSocket.println("The board is full, the game is over. It was a tie!" + Constants.delimiter);
+
         }
         else if (board.oWins() || board.xWins()) {
-            socketOut.println("The game is over.  " + this.name + " is the winner!");
+            socketOut.println("The game is over.  " + this.name + " is the winner!" + Constants.delimiter);
+            opponentSocket.println("The game is over.  " + this.name + " is the winner!" + Constants.delimiter);
         }
         else {
             opponent.play();
@@ -94,6 +103,8 @@ public class Player {
                     boolean isSpaceFilled = board.getMark(row, col) == Constants.SPACE_CHAR ? false : true;
                     if (!isSpaceFilled) {
                         board.addMark(row, col, this.mark);
+//                        board.display(socketOut);
+//                        socketOut.println("Waiting for " + opponent.getName() + " to make their move.");
                         invalidResponse = false;
                     }
                     else {
@@ -131,4 +142,9 @@ public class Player {
     public PrintWriter getSocketOut() {
         return socketOut;
     }
+
+    public String getName() {
+        return name;
+    }
+
 }

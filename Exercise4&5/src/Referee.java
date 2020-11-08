@@ -31,7 +31,7 @@ public class Referee {
         xPlayer.setOpponent(oPlayer);
         oPlayer.setOpponent(xPlayer);
 
-        board.display(xPlayer.getSocketOut());
+//        board.display(xPlayer.getSocketOut());
         xPlayer.play();
     }
 
