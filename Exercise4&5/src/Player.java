@@ -53,21 +53,27 @@ public class Player {
         board.display(socketOut);
         makeMove();
 
-//        board.display();
-
 
         PrintWriter opponentSocket = opponent.getSocketOut();
+
+
+//        board.display();
+
         // send messages to other player too
         if (board.isFull()) {
-            socketOut.println("The board is full, the game is over. It was a tie!" + Constants.delimiter);
-            opponentSocket.println("The board is full, the game is over. It was a tie!" + Constants.delimiter);
+            board.display(opponentSocket);
+            socketOut.println("The board is full, the game is over. It was a tie!" + Constants.printingDelimiter);
+            opponentSocket.println("The board is full, the game is over. It was a tie!" + Constants.printingDelimiter);
 
         }
         else if (board.oWins() || board.xWins()) {
-            socketOut.println("The game is over.  " + this.name + " is the winner!" + Constants.delimiter);
-            opponentSocket.println("The game is over.  " + this.name + " is the winner!" + Constants.delimiter);
+            board.display(opponentSocket);
+            socketOut.println("The game is over.  " + this.name + " is the winner!" + Constants.printingDelimiter);
+            opponentSocket.println("The game is over.  " + this.name + " is the winner!" + Constants.printingDelimiter);
         }
         else {
+            socketOut.println("Waiting for " + opponent.getName() + " to make their move." + Constants.waitingDelimiter);
+            opponentSocket.println(name + " has made their move.  Your turn!" + Constants.printingDelimiter);
             opponent.play();
         }
     }
@@ -103,8 +109,8 @@ public class Player {
                     boolean isSpaceFilled = board.getMark(row, col) == Constants.SPACE_CHAR ? false : true;
                     if (!isSpaceFilled) {
                         board.addMark(row, col, this.mark);
-//                        board.display(socketOut);
-//                        socketOut.println("Waiting for " + opponent.getName() + " to make their move.");
+                        board.display(socketOut);
+
                         invalidResponse = false;
                     }
                     else {

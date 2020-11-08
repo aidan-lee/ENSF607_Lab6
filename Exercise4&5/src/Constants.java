@@ -25,5 +25,7 @@ public interface Constants {
 	 */
 	static final int COL_MAX = 3;
 
-	static final String delimiter = "@KEEP_PRINTING@";
+	static final String printingDelimiter = "@KEEP_PRINTING@";
+
+	static final String waitingDelimiter = "@WAITING@";
 }

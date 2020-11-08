@@ -37,9 +37,15 @@ public class Client {
             try {
                 response = socketIn.readLine();
                 if (keepPrinting(response)) {
-                    response = getEntireResponse(response);
+                    getEntireResponse(response);
+//                    System.out.println(response);
                 }
-                System.out.println(response);
+                else if (waiting(response)) {
+                    waitForResponse(response);
+                }
+                else {
+                    System.out.println(response);
+                }
                 line = stdIn.readLine();
                 socketOut.println(line);
             }
@@ -64,23 +70,52 @@ public class Client {
 
     }
 
-
-    private String getEntireResponse(String response) {
+    private void getEntireResponse(String response) {
         try {
             while (keepPrinting(response)) {
-                response = response.replaceAll(Constants.delimiter, "");
+                response = response.replaceAll(Constants.printingDelimiter, "");
                 response += "\n" + socketIn.readLine();
+            }
+//            System.out.println(response);
+            if (waiting(response)) {
+                waitForResponse(response);
+            }
+            else {
+                System.out.println(response);
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void waitForResponse(String response) {
+        try {
+            while (waiting(response)) {
+                response = response.replaceAll(Constants.waitingDelimiter, "");
+                System.out.println(response);
+                response = socketIn.readLine();
+            }
+            if (keepPrinting(response)) {
+                getEntireResponse(response);
+//                System.out.println(response);
             }
         }
         catch (IOException e) {
             e.printStackTrace();
         }
 
-        return response;
     }
 
     private boolean keepPrinting(String response) {
-        if (response.contains(Constants.delimiter)) {
+        if (response.contains(Constants.printingDelimiter)) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean waiting(String response) {
+        if (response.contains(Constants.waitingDelimiter)) {
             return true;
         }
         return false;
