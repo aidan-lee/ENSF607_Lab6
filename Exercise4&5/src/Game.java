@@ -55,7 +55,7 @@ public class Game implements Constants, Runnable {
     	try {
 			Referee theRef;
 			Player xPlayer, oPlayer;
-			socketOut.println("Please enter the name of the \'X\' player: ");
+			socketOut.println("Please enter the name of the \'X\' player:");
 			String name= socketIn.readLine();
 			System.out.println("received " + name);
 			while (name == null) {
@@ -66,7 +66,7 @@ public class Game implements Constants, Runnable {
 			xPlayer = new Player(name, LETTER_X, socketOut, socketIn);
 			xPlayer.setBoard(this.theBoard);
 
-			socketOut.println("Please enter the name of the \'O\' player: ");
+			socketOut.println("Please enter the name of the \'O\' player:");
 			name = socketIn.readLine();
 			while (name == null) {
 				socketOut.print("Please try again: ");

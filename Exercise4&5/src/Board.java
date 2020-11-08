@@ -83,13 +83,13 @@ public class Board implements Constants {
 
 	public void display(PrintWriter socketOut) {
 		displayColumnHeaders(socketOut);
-		addHyphens();
+		addHyphens(socketOut);
 		for (int row = 0; row < 3; row++) {
 			addSpaces(socketOut);
 			socketOut.print("    row " + row + ' ');
 			for (int col = 0; col < 3; col++)
 				socketOut.print("|  " + getMark(row, col) + "  ");
-			socketOut.println("|");
+			socketOut.println("|" + Constants.delimiter);
 			addSpaces(socketOut);
 			addHyphens(socketOut);
 		}
@@ -178,7 +178,8 @@ public class Board implements Constants {
 		socketOut.print("          ");
 		for (int j = 0; j < 3; j++)
 			socketOut.print("|col " + j);
-		socketOut.println();
+		socketOut.println(Constants.delimiter);
+//		socketOut.println(Constants.delimiter);
 	}
 
 	/**
@@ -195,7 +196,7 @@ public class Board implements Constants {
 		socketOut.print("          ");
 		for (int j = 0; j < 3; j++)
 			socketOut.print("+-----");
-		socketOut.println("+");
+		socketOut.println("+" + Constants.delimiter);
 	}
 
 	/**
@@ -212,6 +213,6 @@ public class Board implements Constants {
 		socketOut.print("          ");
 		for (int j = 0; j < 3; j++)
 			socketOut.print("|     ");
-		socketOut.println("|");
+		socketOut.println("|" + Constants.delimiter);
 	}
 }

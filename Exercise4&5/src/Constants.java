@@ -24,4 +24,6 @@ public interface Constants {
 	 * Defining the maximum number of columns in the tic-tac-toe game
 	 */
 	static final int COL_MAX = 3;
+
+	static final String delimiter = "@KEEP_PRINTING@";
 }

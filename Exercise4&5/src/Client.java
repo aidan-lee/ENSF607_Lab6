@@ -28,14 +28,17 @@ public class Client {
         }
 
     }
+
     public void communicate () {
         String line = "";
         String response = "";
 
         while (!line.equals("QUIT")) {
-
             try {
                 response = socketIn.readLine();
+                if (keepPrinting(response)) {
+                    response = getEntireResponse(response);
+                }
                 System.out.println(response);
                 line = stdIn.readLine();
                 socketOut.println(line);
@@ -60,6 +63,29 @@ public class Client {
         closeSocket ();
 
     }
+
+
+    private String getEntireResponse(String response) {
+        try {
+            while (keepPrinting(response)) {
+                response = response.replaceAll(Constants.delimiter, "");
+                response += "\n" + socketIn.readLine();
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    private boolean keepPrinting(String response) {
+        if (response.contains(Constants.delimiter)) {
+            return true;
+        }
+        return false;
+    }
+
     private void closeSocket () {
 
         try {
