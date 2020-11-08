@@ -2,6 +2,8 @@
 
 //STUDENTS SHOULD ADD CLASS COMMENTS, METHOD COMMENTS, FIELD COMMENTS 
 
+import java.io.PrintWriter;
+
 /**
  * Defines logic for marking the tic-tac-toe board and determining game-over conditions.
  */
@@ -76,6 +78,20 @@ public class Board implements Constants {
 			System.out.println("|");
 			addSpaces();
 			addHyphens();
+		}
+	}
+
+	public void display(PrintWriter socketOut) {
+		displayColumnHeaders(socketOut);
+		addHyphens();
+		for (int row = 0; row < 3; row++) {
+			addSpaces(socketOut);
+			socketOut.print("    row " + row + ' ');
+			for (int col = 0; col < 3; col++)
+				socketOut.print("|  " + getMark(row, col) + "  ");
+			socketOut.println("|");
+			addSpaces(socketOut);
+			addHyphens(socketOut);
 		}
 	}
 
@@ -158,6 +174,13 @@ public class Board implements Constants {
 		System.out.println();
 	}
 
+	void displayColumnHeaders(PrintWriter socketOut) {
+		socketOut.print("          ");
+		for (int j = 0; j < 3; j++)
+			socketOut.print("|col " + j);
+		socketOut.println();
+	}
+
 	/**
 	 * Prints the horizontal lines of the board
 	 */
@@ -168,6 +191,13 @@ public class Board implements Constants {
 		System.out.println("+");
 	}
 
+	void addHyphens(PrintWriter socketOut) {
+		socketOut.print("          ");
+		for (int j = 0; j < 3; j++)
+			socketOut.print("+-----");
+		socketOut.println("+");
+	}
+
 	/**
 	 * Prints the vertical lines of the board and the spaces between
 	 */
@@ -176,5 +206,12 @@ public class Board implements Constants {
 		for (int j = 0; j < 3; j++)
 			System.out.print("|     ");
 		System.out.println("|");
+	}
+
+	void addSpaces(PrintWriter socketOut) {
+		socketOut.print("          ");
+		for (int j = 0; j < 3; j++)
+			socketOut.print("|     ");
+		socketOut.println("|");
 	}
 }

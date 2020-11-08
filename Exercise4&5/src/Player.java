@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Scanner;
 
 /**
@@ -22,16 +25,21 @@ public class Player {
      */
     private char mark;
 
+    private PrintWriter socketOut;
+    private BufferedReader socketIn;
+
     /**
      * A constructor for Player objects
      * @param name The player's name
      * @param mark The player's mark
      */
-    public Player(String name, char mark) {
+    public Player(String name, char mark, PrintWriter socketOut, BufferedReader socketIn) {
         this.name = name;
         this.board = null;
         this.opponent = null;
         this.mark = mark;
+        this.socketIn = socketIn;
+        this.socketOut = socketOut;
     }
 
     /**
@@ -42,13 +50,13 @@ public class Player {
     public void play() {
 
         makeMove();
-        board.display();
+        board.display(socketOut);
 
         if (board.isFull()) {
-            System.out.println("The board is full, the game is over. It was a tie!");
+            socketOut.println("The board is full, the game is over. It was a tie!");
         }
         else if (board.oWins() || board.xWins()) {
-            System.out.println("The game is over.  " + this.name + " is the winner!");
+            socketOut.println("The game is over.  " + this.name + " is the winner!");
         }
         else {
             opponent.play();
@@ -70,30 +78,36 @@ public class Player {
 
         boolean invalidResponse = true;
 
-        Scanner scanner = new Scanner(System.in);
+//        Scanner scanner = new Scanner(System.in);
 
         while (invalidResponse) {
-            System.out.println(this.name + ", what row should your next " + this.mark + " be placed in?");
-            rowString = scanner.nextLine();
-            System.out.println(this.name + ", what column should your next " + this.mark + " be placed in?");
-            colString = scanner.nextLine();
+            try {
+                socketOut.println(this.name + ", what row should your next " + this.mark + " be placed in?");
+                rowString = socketIn.readLine();
+                socketOut.println(this.name + ", what column should your next " + this.mark + " be placed in?");
+                colString = socketIn.readLine();
 
-            row = Integer.parseInt(rowString);
-            col = Integer.parseInt(colString);
+                row = Integer.parseInt(rowString);
+                col = Integer.parseInt(colString);
 
-            if (row < Constants.ROW_MAX && col < Constants.COL_MAX) {
-                boolean isSpaceFilled = board.getMark(row, col) == Constants.SPACE_CHAR ? false : true;
-                if (!isSpaceFilled) {
-                    board.addMark(row, col, this.mark);
-                    invalidResponse = false;
+                if (row < Constants.ROW_MAX && col < Constants.COL_MAX) {
+                    boolean isSpaceFilled = board.getMark(row, col) == Constants.SPACE_CHAR ? false : true;
+                    if (!isSpaceFilled) {
+                        board.addMark(row, col, this.mark);
+                        invalidResponse = false;
+                    }
+                    else {
+                        socketOut.println("That space is occupied. Please try again, " + this.name + ".");
+                    }
                 }
                 else {
-                    System.out.println("That space is occupied. Please try again, " + this.name + ".");
+                    socketOut.println("Invalid input. Please try again, " + this.name + ".");
                 }
             }
-            else {
-                System.out.println("Invalid input. Please try again, " + this.name + ".");
+            catch (IOException e) {
+                e.printStackTrace();
             }
+
         }
     }
 
@@ -114,5 +128,7 @@ public class Player {
     }
 
 
-
+    public PrintWriter getSocketOut() {
+        return socketOut;
+    }
 }
