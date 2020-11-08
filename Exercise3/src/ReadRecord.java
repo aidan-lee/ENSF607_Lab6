@@ -48,10 +48,6 @@ public class ReadRecord {
                 System.out.println(record.getSingerName());
                 System.out.println(record.getPurchasePrice());
                 System.out.println("--------------------");
-
-                
-                // TO BE COMPLETED BY THE STUDENTS
-                
            
             }   // END OF WHILE
         }
@@ -64,9 +60,6 @@ public class ReadRecord {
         catch (ClassNotFoundException classEx) {
             System.err.println("No class MusicRecord found");
         }
-
-                // ADD NECESSARY catch CLAUSES HERE
-
     }           // END OF METHOD 
     
     
