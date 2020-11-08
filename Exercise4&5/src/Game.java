@@ -34,8 +34,6 @@ public class Game implements Constants, Runnable {
 		this.socketOut1 = socketOut1;
 		this.socketIn2 = socketIn2;
 		this.socketOut2 = socketOut2;
-//		stdin = new BufferedReader(new InputStreamReader(System.in));
-
 
 	}
 

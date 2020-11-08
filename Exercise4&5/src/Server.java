@@ -4,8 +4,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 public class Server {
 
@@ -22,7 +21,8 @@ public class Server {
     public Server() {
         try {
             serverSocket = new ServerSocket(9000);
-            pool = Executors.newFixedThreadPool(2);
+            pool = Executors.newCachedThreadPool();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -38,16 +38,17 @@ public class Server {
                 socketIn1 = new BufferedReader(new InputStreamReader(socket1.getInputStream()));
                 socketOut1 = new PrintWriter(socket1.getOutputStream(), true);
 
+                System.out.println("Console at Server side says: Connection accepted by the server!");
                 socket2 = serverSocket.accept();
                 socketIn2 = new BufferedReader(new InputStreamReader(socket2.getInputStream()));
                 socketOut2 = new PrintWriter(socket2.getOutputStream(), true);
+
                 Game game = new Game(socketOut1, socketIn1, socketOut2, socketIn2);
                 pool.execute(game);
 
 
             }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         pool.shutdown();
@@ -57,7 +58,6 @@ public class Server {
             socketIn2.close();
             socketOut2.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
