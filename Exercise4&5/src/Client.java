@@ -5,30 +5,46 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+/**
+ * Handles receiving and displaying messages from the server, and sending messages from the client back to the server
+ */
 public class Client {
 
-    private Socket aSocket;
+    // A socket
+    private Socket socket;
+
+    // Socket used to write to the server
     private PrintWriter socketOut;
+
+    // Socket used to receive messages from the server
     private BufferedReader socketIn;
+
+    // Used to read user input from the console
     private BufferedReader stdIn;
 
+    /**
+     * Creates a Client object
+     * @param serverName name of the server
+     * @param portNumber port number the socket should listen on
+     */
     public Client (String serverName, int portNumber) {
-
         try {
-            aSocket = new Socket (serverName, portNumber);
-            //keyboard input stream
-            stdIn = new BufferedReader (new InputStreamReader (System.in));
-            socketIn = new BufferedReader (new InputStreamReader (aSocket.getInputStream()));
-            socketOut = new PrintWriter (aSocket.getOutputStream(), true);
-        }catch (UnknownHostException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
+            socket = new Socket(serverName, portNumber);
+            stdIn = new BufferedReader(new InputStreamReader (System.in));
+            socketIn = new BufferedReader(new InputStreamReader (socket.getInputStream()));
+            socketOut = new PrintWriter (socket.getOutputStream(), true);
+        }
+        catch (UnknownHostException e) {
             e.printStackTrace();
         }
-
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
+    /**
+     * Receives messages from the client and sends the user's input back, until it receives the message to stop.
+     */
     public void communicate () {
         String line = "";
         String response = "";
@@ -38,7 +54,6 @@ public class Client {
                 response = socketIn.readLine();
                 if (keepPrinting(response)) {
                     getEntireResponse(response);
-//                    System.out.println(response);
                 }
                 else if (waiting(response)) {
                     waitForResponse(response);
@@ -52,31 +67,22 @@ public class Client {
             catch (IOException e) {
                 e.printStackTrace();
             }
-
-
-//            System.out.println("Enter a word to capitalize or type QUIT to end:");
-//            try {
-//                line = stdIn.readLine();
-//                socketOut.println(line);
-//                response = socketIn.readLine();  //read response form the socket
-//                System.out.println("The response is: "+ response);
-//            } catch (IOException e) {
-//                // TODO Auto-generated catch block
-//                e.printStackTrace();
-//            } //reading the input from the user (i.e. the keyboard);
-
         }
-        closeSocket ();
+        closeSockets();
 
     }
 
+    /**
+     * Prints a multi-line server response to the client's console
+     * (ie. When printing the tic tac toe board)
+     * @param response the first line of the server response
+     */
     private void getEntireResponse(String response) {
         try {
             while (keepPrinting(response)) {
                 response = response.replaceAll(Constants.printingDelimiter, "");
                 response += "\n" + socketIn.readLine();
             }
-//            System.out.println(response);
             if (waiting(response)) {
                 waitForResponse(response);
             }
@@ -89,6 +95,11 @@ public class Client {
         }
     }
 
+    /**
+     * Prints multiple server responses to the client's console
+     * (ie. When waiting for the other player to make their move)
+     * @param response
+     */
     private void waitForResponse(String response) {
         try {
             while (waiting(response)) {
@@ -98,15 +109,18 @@ public class Client {
             }
             if (keepPrinting(response)) {
                 getEntireResponse(response);
-//                System.out.println(response);
             }
         }
         catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
+    /**
+     * Looks for the printingDelimiter substring in a server response
+     * @param response the server response
+     * @return true if the delimiter is found, false otherwise
+     */
     private boolean keepPrinting(String response) {
         if (response.contains(Constants.printingDelimiter)) {
             return true;
@@ -114,6 +128,11 @@ public class Client {
         return false;
     }
 
+    /**
+     * Looks for the waitingDelimiter substring in a server response
+     * @param response the server response
+     * @return true if the delimiter is found, false otherwise
+     */
     private boolean waiting(String response) {
         if (response.contains(Constants.waitingDelimiter)) {
             return true;
@@ -121,23 +140,27 @@ public class Client {
         return false;
     }
 
-    private void closeSocket () {
-
+    /**
+     * Closes sockets to terminate server connection.
+     */
+    private void closeSockets() {
         try {
             stdIn.close();
             socketIn.close();
             socketOut.close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
-
     }
-    public static void main (String [] args) throws IOException {
 
-        Client aClient = new Client ("localhost", 9000);
-        aClient.communicate();
-
+    /**
+     * Creates a Client object and initiates a connection to the server
+     * @param args
+     */
+    public static void main (String [] args) {
+        Client client = new Client ("localhost", 9000);
+        client.communicate();
     }
 
 }

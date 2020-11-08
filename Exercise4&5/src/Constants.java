@@ -25,7 +25,13 @@ public interface Constants {
 	 */
 	static final int COL_MAX = 3;
 
+	/**
+	 * Defining a substring to indicate that a server response has multiple lines
+	 */
 	static final String printingDelimiter = "@KEEP_PRINTING@";
 
+	/**
+	 * Defining a substring to indicate that a server response is waiting on a response from another client
+	 */
 	static final String waitingDelimiter = "@WAITING@";
 }

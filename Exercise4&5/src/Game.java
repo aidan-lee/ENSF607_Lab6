@@ -3,7 +3,7 @@ import java.io.*;
 
 /**
  * The main controller of the tic-tac-toe game.
- * Contains the main method.
+ * Implements Runnable to allow the server to run multiple games at once.
  */
 public class Game implements Constants, Runnable {
 
@@ -17,29 +17,22 @@ public class Game implements Constants, Runnable {
 	 */
 	private Referee theRef;
 
-
-	BufferedReader stdin;
-
-	private PrintWriter socketOut1;
-	private BufferedReader socketIn1;
-	private PrintWriter socketOut2;
-	private BufferedReader socketIn2;
+	private PrintWriter socketOutX;
+	private BufferedReader socketInX;
+	private PrintWriter socketOutO;
+	private BufferedReader socketInO;
 
 	/**
 	 * A constructor for Game objects
 	 */
     public Game(PrintWriter socketOut1, BufferedReader socketIn1, PrintWriter socketOut2, BufferedReader socketIn2) {
         theBoard  = new Board();
-		this.socketIn1 = socketIn1;
-		this.socketOut1 = socketOut1;
-		this.socketIn2 = socketIn2;
-		this.socketOut2 = socketOut2;
+		this.socketInX = socketIn1;
+		this.socketOutX = socketOut1;
+		this.socketInO = socketIn2;
+		this.socketOutO = socketOut2;
 
 	}
-
-
-
-
 
 	/**
 	 * Appoints the Referee and prompts it to begin the game
@@ -51,30 +44,40 @@ public class Game implements Constants, Runnable {
     	theRef.runTheGame();
     }
 
+	/**
+
+	 * @param args
+	 * @throws IOException
+	 */
+
+	/**
+	 * The driver of the tic-tac-toe game.
+	 * Prompts players to enter their names, and constructs the Player objects.
+	 * Constructs a Referee object, which starts the game.
+	 */
 	@Override
 	public void run() {
     	try {
 			Referee theRef;
 			Player xPlayer, oPlayer;
-			socketOut1.println("Please enter the name of the \'X\' player:");
-			String name= socketIn1.readLine();
-			System.out.println("received " + name);
+			socketOutX.println("Please enter the name of the \'X\' player:");
+			String name = socketInX.readLine();
 			while (name == null) {
-				socketOut1.print("Please try again: ");
-				name = socketIn1.readLine();
+				socketOutX.print("Please try again: ");
+				name = socketInX.readLine();
 			}
 
-			xPlayer = new Player(name, LETTER_X, socketOut1, socketIn1);
+			xPlayer = new Player(name, LETTER_X, socketOutX, socketInX);
 			xPlayer.setBoard(this.theBoard);
 
-			socketOut2.println("Please enter the name of the \'O\' player:");
-			name = socketIn2.readLine();
+			socketOutO.println("Please enter the name of the \'O\' player:");
+			name = socketInO.readLine();
 			while (name == null) {
-				socketOut2.print("Please try again: ");
-				name = socketIn2.readLine();
+				socketOutO.print("Please try again: ");
+				name = socketInO.readLine();
 			}
 
-			oPlayer = new Player(name, LETTER_O, socketOut2, socketIn2);
+			oPlayer = new Player(name, LETTER_O, socketOutO, socketInO);
 			oPlayer.setBoard(this.theBoard);
 
 			theRef = new Referee();
@@ -84,57 +87,12 @@ public class Game implements Constants, Runnable {
 
 			this.appointReferee(theRef);
 
-			socketOut1.println("Thank you for playing");
-			socketOut2.println("Thank you for playing");
-
-
+			socketOutX.println("Thank you for playing");
+			socketOutO.println("Thank you for playing");
 		}
 		catch (IOException e) {
     		e.printStackTrace();
 		}
 
 	}
-
-	/**
-	 * The controller of the tic-tac-toe game.
-	 * Prompts players to enter their names, and constructs the Player objects.
-	 * Constructs a Referee object
-	 * @param args
-	 * @throws IOException
-	 */
-//	public static void main(String[] args) throws IOException {
-//		Referee theRef;
-//		Player xPlayer, oPlayer;
-//		BufferedReader stdin;
-//		Game theGame = new Game();
-//		stdin = new BufferedReader(new InputStreamReader(System.in));
-//		System.out.print("\nPlease enter the name of the \'X\' player: ");
-//		String name= stdin.readLine();
-//		while (name == null) {
-//			System.out.print("Please try again: ");
-//			name = stdin.readLine();
-//		}
-//
-//		xPlayer = new Player(name, LETTER_X);
-//		xPlayer.setBoard(theGame.theBoard);
-//
-//		System.out.print("\nPlease enter the name of the \'O\' player: ");
-//		name = stdin.readLine();
-//		while (name == null) {
-//			System.out.print("Please try again: ");
-//			name = stdin.readLine();
-//		}
-//
-//		oPlayer = new Player(name, LETTER_O);
-//		oPlayer.setBoard(theGame.theBoard);
-//
-//		theRef = new Referee();
-//		theRef.setBoard(theGame.theBoard);
-//		theRef.setoPlayer(oPlayer);
-//		theRef.setxPlayer(xPlayer);
-//
-//        theGame.appointReferee(theRef);
-//	}
-	
-
 }

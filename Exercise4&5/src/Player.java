@@ -1,7 +1,6 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Scanner;
 
 /**
  * Defines all the attributes and capabilities of a Player.
@@ -25,7 +24,14 @@ public class Player {
      */
     private char mark;
 
+    /**
+     * Used to write messages to the user
+     */
     private PrintWriter socketOut;
+
+    /**
+     * Used to receive messages from the server
+     */
     private BufferedReader socketIn;
 
     /**
@@ -48,16 +54,10 @@ public class Player {
      * If neither have occurred, it passes the turn to the opposing player.
      */
     public void play() {
-//        socketOut.println("play for player " + name + Constants.delimiter);
-//        System.out.println("\"play for player \" + name + Constants.delimiter");
         board.display(socketOut);
         makeMove();
 
-
         PrintWriter opponentSocket = opponent.getSocketOut();
-
-
-//        board.display();
 
         // send messages to other player too
         if (board.isFull()) {
@@ -92,8 +92,6 @@ public class Player {
         String colString;
 
         boolean invalidResponse = true;
-
-//        Scanner scanner = new Scanner(System.in);
 
         while (invalidResponse) {
             try {
@@ -144,11 +142,18 @@ public class Player {
         this.board = theBoard;
     }
 
-
+    /**
+     * Returns the object's socketOut object
+     * @return
+     */
     public PrintWriter getSocketOut() {
         return socketOut;
     }
 
+    /**
+     * Returns the object's name field
+     * @return
+     */
     public String getName() {
         return name;
     }

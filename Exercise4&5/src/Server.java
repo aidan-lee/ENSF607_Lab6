@@ -6,66 +6,116 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.*;
 
+/**
+ * Handles setting up connections to clients and beginning new tic tac toe game.
+ * Starts a new game for every 2 client connections.
+ */
 public class Server {
+    /**
+     * A socket for the X player
+     */
+    private Socket socketX;
 
-    private Socket socket1;
-    private Socket socket2;
+    /**
+     * A socket for the O player
+     */
+    private Socket socketO;
+
+    /**
+     * Socket used to connect to clients
+     */
     private ServerSocket serverSocket;
-    private PrintWriter socketOut1;
-    private BufferedReader socketIn1;
-    private PrintWriter socketOut2;
-    private BufferedReader socketIn2;
 
+    /**
+     * Socket used to send messages to the X player
+     */
+    private PrintWriter socketOutX;
+
+    /**
+     * Socket used to receive messages from the X player
+     */
+    private BufferedReader socketInX;
+
+    /**
+     * Socket used to send messages to the O player
+     */
+    private PrintWriter socketOutO;
+
+    /**
+     * Socket used to receive messages from the O player
+     */
+    private BufferedReader socketInO;
+
+    /**
+     * A thread pool
+     */
     private ExecutorService pool;
 
+    /**
+     * Creates a Server object
+     */
     public Server() {
         try {
             serverSocket = new ServerSocket(9000);
             pool = Executors.newCachedThreadPool();
-
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
+    /**
+     * Sets up connection between the server and clients.
+     * Starts a new tic tac toe game for every two clients that connect.
+     */
     public void runServer() {
-
         try {
             while (true) {
-                socket1 = serverSocket.accept();
-                System.out.println("Console at Server side says: Connection accepted by the server!");
-                socketIn1 = new BufferedReader(new InputStreamReader(socket1.getInputStream()));
-                socketOut1 = new PrintWriter(socket1.getOutputStream(), true);
+                socketX = serverSocket.accept();
+                System.out.println("Client connection accepted by the server!");
+                socketInX = new BufferedReader(new InputStreamReader(socketX.getInputStream()));
+                socketOutX = new PrintWriter(socketX.getOutputStream(), true);
 
-                System.out.println("Console at Server side says: Connection accepted by the server!");
-                socket2 = serverSocket.accept();
-                socketIn2 = new BufferedReader(new InputStreamReader(socket2.getInputStream()));
-                socketOut2 = new PrintWriter(socket2.getOutputStream(), true);
+                System.out.println("Client connection accepted by the server!");
+                socketO = serverSocket.accept();
+                socketInO = new BufferedReader(new InputStreamReader(socketO.getInputStream()));
+                socketOutO = new PrintWriter(socketO.getOutputStream(), true);
 
-                Game game = new Game(socketOut1, socketIn1, socketOut2, socketIn2);
+                System.out.println("Beginning new game...");
+                Game game = new Game(socketOutX, socketInX, socketOutO, socketInO);
                 pool.execute(game);
-
-
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
         pool.shutdown();
+        closeSockets();
+    }
+
+    /**
+     * Closes sockets to terminate server connection.
+     */
+    private void closeSockets() {
         try {
-            socketIn1.close();
-            socketOut1.close();
-            socketIn2.close();
-            socketOut2.close();
-        } catch (IOException e) {
+            socketInX.close();
+            socketOutX.close();
+            socketInO.close();
+            socketOutO.close();
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-
+    /**
+     * Creates a Server object and starts the server
+     * @param args
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
-
         Server myServer = new Server();
+        System.out.println("Server is running...");
         myServer.runServer();
     }
 
