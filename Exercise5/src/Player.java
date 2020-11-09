@@ -68,14 +68,14 @@ public class Player {
         // send messages to other player too
         if (board.isFull()) {
             board.display(opponentSocket);
-            socketOut.println("The board is full, the game is over. It was a tie!" + Constants.printingDelimiter);
-            opponentSocket.println("The board is full, the game is over. It was a tie!" + Constants.printingDelimiter);
+            socketOut.println("The board is full, the game is over. It was a tie!" + Constants.messageIndicator);
+            opponentSocket.println("The board is full, the game is over. It was a tie!" + Constants.messageIndicator);
 
         }
         else if (board.oWins() || board.xWins()) {
             board.display(opponentSocket);
-            socketOut.println("The game is over.  " + this.name + " is the winner!" + Constants.printingDelimiter);
-            opponentSocket.println("The game is over.  " + this.name + " is the winner!" + Constants.printingDelimiter);
+            socketOut.println("The game is over.  " + this.name + " is the winner!" + Constants.messageIndicator);
+            opponentSocket.println("The game is over.  " + this.name + " is the winner!" + Constants.messageIndicator);
         }
         else {
             socketOut.println("Waiting for " + opponent.getName() + " to make their move." + Constants.waitingDelimiter);

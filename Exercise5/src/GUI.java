@@ -23,7 +23,7 @@ public class GUI extends JFrame {
 //    Player player;
 
     String playerName;
-    String currentMark = Character.toString(Constants.LETTER_X);
+    String mark = Character.toString(Constants.LETTER_X);
 
     // A socket
     private Socket socket;
@@ -38,6 +38,7 @@ public class GUI extends JFrame {
     private BufferedReader stdIn;
 
     ArrayList<Pair<String, JButton>> buttons;
+    JTextArea messageBox;
 
 
     public GUI(int w, int h, String serverName, int portNumber) {
@@ -51,6 +52,13 @@ public class GUI extends JFrame {
 
         buttons = new ArrayList<>();
         createButtons();
+
+        messageBox = new JTextArea();
+        messageBox.setEditable(false);
+        messageBox.setBounds(10,50, 100, 100);
+        messageBox.setColumns(20);
+        messageBox.setRows(10);
+        messageBox.setLineWrap(true);
 
 
 
@@ -93,6 +101,9 @@ public class GUI extends JFrame {
                 }
                 else if (opponentMove(response)) {
                     displayOppponentMove(response);
+                }
+                else if (receivedMessage(response)) {
+                    displayMessage(response);
                 }
                 else {
                     displayGame(response);
@@ -159,10 +170,20 @@ public class GUI extends JFrame {
         return false;
     }
 
+
+    private boolean receivedMessage(String response) {
+        if (response.contains(Constants.messageIndicator)) {
+            return true;
+        }
+        return false;
+    }
+
     private void displayNameForm(String response) {
 
         String name = JOptionPane.showInputDialog(response);
+        playerName = name;
         socketOut.println(name);
+
 
 //        mainWindow.getContentPane().removeAll();
 //        response = response.replaceAll(Constants.nameDelimiter, "");
@@ -198,22 +219,39 @@ public class GUI extends JFrame {
         // Set up left panel, containing the board
         JPanel left = new JPanel();
 //        left.setLayout(new GridLayout());
+        JLabel nameLabel = new JLabel(playerName);
+        nameLabel.setBounds(10,10, 100, 100);
+        left.add(nameLabel);
+        JLabel markLabel = new JLabel(mark);
+        markLabel.setBounds(10,30, 100, 100);
+        left.add(markLabel);
         JLabel turnIndicator = new JLabel(turn);
-        turnIndicator.setBounds(10,10, 100, 100);
+        turnIndicator.setBounds(10,60, 100, 100);
         left.add(turnIndicator);
         JPanel board = createBoard();
-        board.setBounds(10, 30, 100, 100);
+        board.setBounds(10, 70, 100, 100);
         left.add(board);
 
         // Set up right panel, containing the message box
         JPanel right = new JPanel();
+//        right.setLayout(new GridLayout(2, 1));
+//        right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
+        //        right.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        right.setLayout(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+
         JLabel messageTitle = new JLabel("Message Window");
         messageTitle.setBounds(10,10, 100, 100);
-        right.add(messageTitle);
-        JTextArea messageBox = new JTextArea();
-        messageBox.setEditable(false);
-        messageBox.setBounds(10,50, 100, 100);
-        right.add(messageBox);
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        right.add(messageTitle, constraints);
+//        pane.add(button, c);
+//        right.add(messageTitle);
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        right.add(messageBox, constraints);
 
         mainWindow.add(left);
         mainWindow.add(right);
@@ -257,7 +295,7 @@ public class GUI extends JFrame {
                         try {
                             String response = socketIn.readLine();
                             if (moveSuccess(response)) {
-                                b.setText(currentMark);
+                                b.setText(mark);
                                 b.setEnabled(false);
                             }
                         }
@@ -285,6 +323,10 @@ public class GUI extends JFrame {
                     button.setEnabled(false);
                 }
             }
+    }
+
+    private void displayMessage(String response) {
+        messageBox.setText(response);
     }
 
     private void sendRowCol(JButton b) {
