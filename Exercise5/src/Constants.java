@@ -36,4 +36,8 @@ public interface Constants {
 	static final String waitingDelimiter = "@WAITING@";
 
 	static final String nameDelimiter = "@ENTER_NAME@";
+
+	static final String moveSuccess = "@MARK_PLACED@";
+
+	static final String opponentMove = "@OPPONENT_MOVE@";
 }

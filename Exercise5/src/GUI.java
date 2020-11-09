@@ -1,5 +1,8 @@
 
+import javafx.util.Pair;
+
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -8,6 +11,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class GUI extends JFrame {
 
@@ -15,7 +20,10 @@ public class GUI extends JFrame {
     int width;
     int height;
 //    Board board;
-    Player player;
+//    Player player;
+
+    String playerName;
+    String currentMark = Character.toString(Constants.LETTER_X);
 
     // A socket
     private Socket socket;
@@ -29,6 +37,9 @@ public class GUI extends JFrame {
     // Used to read user input from the console
     private BufferedReader stdIn;
 
+    ArrayList<Pair<String, JButton>> buttons;
+
+
     public GUI(int w, int h, String serverName, int portNumber) {
         width = w;
         height = h;
@@ -37,6 +48,11 @@ public class GUI extends JFrame {
         mainWindow.setTitle("Tic Tac Toe");
         mainWindow.setSize(width, height);
         mainWindow.setVisible(true);
+
+        buttons = new ArrayList<>();
+        createButtons();
+
+
 
         try {
             socket = new Socket(serverName, portNumber);
@@ -75,6 +91,12 @@ public class GUI extends JFrame {
 //                    System.out.println("Read " + line);
 //                    socketOut.println(line);
                 }
+                else if (opponentMove(response)) {
+                    displayOppponentMove(response);
+                }
+                else {
+                    displayGame(response);
+                }
 //                if (keepPrinting(response)) {
 //                    getEntireResponse(response);
 //                }
@@ -94,61 +116,6 @@ public class GUI extends JFrame {
         closeSockets();
     }
 
-    /**
-     * Prints a multi-line server response to the client's console
-     * (ie. When printing the tic tac toe board)
-     * @param response the first line of the server response
-     */
-    private void getEntireResponse(String response) {
-        try {
-            while (keepPrinting(response)) {
-                response = response.replaceAll(Constants.printingDelimiter, "");
-                response += "\n" + socketIn.readLine();
-            }
-            if (waiting(response)) {
-                waitForResponse(response);
-            }
-            else {
-                System.out.println(response);
-            }
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Prints multiple server responses to the client's console
-     * (ie. When waiting for the other player to make their move)
-     * @param response
-     */
-    private void waitForResponse(String response) {
-        try {
-            while (waiting(response)) {
-                response = response.replaceAll(Constants.waitingDelimiter, "");
-                System.out.println(response);
-                response = socketIn.readLine();
-            }
-            if (keepPrinting(response)) {
-                displayNameForm(response);
-            }
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Looks for the printingDelimiter substring in a server response
-     * @param response the server response
-     * @return true if the delimiter is found, false otherwise
-     */
-    private boolean keepPrinting(String response) {
-        if (response.contains(Constants.printingDelimiter)) {
-            return true;
-        }
-        return false;
-    }
 
     /**
      * Looks for the waitingDelimiter substring in a server response
@@ -178,13 +145,24 @@ public class GUI extends JFrame {
         return false;
     }
 
+    private boolean moveSuccess(String response) {
+        if (response.contains(Constants.moveSuccess)) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean opponentMove(String response) {
+        if (response.contains(Constants.opponentMove)) {
+            return true;
+        }
+        return false;
+    }
+
     private void displayNameForm(String response) {
 
         String name = JOptionPane.showInputDialog(response);
         socketOut.println(name);
-
-
-
 
 //        mainWindow.getContentPane().removeAll();
 //        response = response.replaceAll(Constants.nameDelimiter, "");
@@ -211,6 +189,117 @@ public class GUI extends JFrame {
 //        });
 //        mainWindow.add(submitName);
 //        mainWindow.repaint();
+    }
+
+    private void displayGame(String turn) {
+        mainWindow.getContentPane().removeAll();
+        mainWindow.setLayout(new GridLayout(1, 2, 50, 50));
+
+        // Set up left panel, containing the board
+        JPanel left = new JPanel();
+//        left.setLayout(new GridLayout());
+        JLabel turnIndicator = new JLabel(turn);
+        turnIndicator.setBounds(10,10, 100, 100);
+        left.add(turnIndicator);
+        JPanel board = createBoard();
+        board.setBounds(10, 30, 100, 100);
+        left.add(board);
+
+        // Set up right panel, containing the message box
+        JPanel right = new JPanel();
+        JLabel messageTitle = new JLabel("Message Window");
+        messageTitle.setBounds(10,10, 100, 100);
+        right.add(messageTitle);
+        JTextArea messageBox = new JTextArea();
+        messageBox.setEditable(false);
+        messageBox.setBounds(10,50, 100, 100);
+        right.add(messageBox);
+
+        mainWindow.add(left);
+        mainWindow.add(right);
+        mainWindow.repaint();
+        mainWindow.setVisible(true);
+
+    }
+
+    private JPanel createBoard() {
+        System.out.println("creating board");
+        JPanel board = new JPanel();
+        board.setLayout(new GridLayout(Constants.ROW_MAX, Constants.COL_MAX));
+//        JButton b1 = new JButton();
+
+        populateButtons(board);
+
+//        int buttonNum = Constants.ROW_MAX * Constants.COL_MAX;
+
+
+        return board;
+    }
+
+    private void populateButtons(JPanel board) {
+        for (int i = 0; i < buttons.size(); i++) {
+            board.add(buttons.get(i).getValue());
+        }
+    }
+
+    private void createButtons() {
+        for (int i = 0; i < Constants.ROW_MAX; i++) {
+            for (int j = 0; j < Constants.COL_MAX; j++) {
+                JButton b = new JButton();
+                String buttonKey = Integer.toString(i) + "," + Integer.toString(j);
+                buttons.add(new Pair(buttonKey, b));
+                b.setPreferredSize(new Dimension(50, 50));
+                b.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        sendRowCol(b);
+
+                        try {
+                            String response = socketIn.readLine();
+                            if (moveSuccess(response)) {
+                                b.setText(currentMark);
+                                b.setEnabled(false);
+                            }
+                        }
+                        catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+
+                    }
+                });
+            }
+        }
+    }
+
+    private void displayOppponentMove(String response) {
+            String[] opponentMove = response.split(":");
+            System.out.println("opponent move length: " +opponentMove.length);
+            System.out.println(Arrays.toString(opponentMove));
+            String mark = opponentMove[0];
+            String coordinates = opponentMove[1];
+
+            for (Pair buttonPair : buttons) {
+                if (buttonPair.getKey().equals(coordinates)) {
+                    JButton button = (JButton) buttonPair.getValue();
+                    button.setText(mark);
+                    button.setEnabled(false);
+                }
+            }
+    }
+
+    private void sendRowCol(JButton b) {
+        for (Pair buttonPair : buttons) {
+            if (buttonPair.getValue().equals(b)) {
+                String key = (String)buttonPair.getKey();
+                String[] keyValues = key.split(",");
+
+                for (int i = 0; i < keyValues.length; i++) {
+                    socketOut.println(keyValues[i]);
+                }
+                break;
+            }
+        }
+
     }
 
     /**

@@ -82,6 +82,20 @@ public class Board implements Constants {
 		}
 	}
 
+	public void display() {
+		displayColumnHeaders();
+		addHyphens();
+		for (int row = 0; row < 3; row++) {
+			addSpaces();
+			System.out.print("    row " + row + ' ');
+			for (int col = 0; col < 3; col++)
+				System.out.print("|  " + getMark(row, col) + "  ");
+			System.out.println("|" + Constants.printingDelimiter);
+			addSpaces();
+			addHyphens();
+		}
+	}
+
 	/**
 	 * Adds the specified mark to the space with a matching row and column
 	 * @param row The row number to add the mark to
@@ -163,6 +177,14 @@ public class Board implements Constants {
 //		socketOut.println(Constants.delimiter);
 	}
 
+	void displayColumnHeaders() {
+		System.out.print("          ");
+		for (int j = 0; j < 3; j++)
+			System.out.print("|col " + j);
+		System.out.println(Constants.printingDelimiter);
+//		socketOut.println(Constants.delimiter);
+	}
+
 	/**
 	 * Prints the horizontal lines of the board
 	 * @param socketOut the socket to print to
@@ -172,6 +194,13 @@ public class Board implements Constants {
 		for (int j = 0; j < 3; j++)
 			socketOut.print("+-----");
 		socketOut.println("+" + Constants.printingDelimiter);
+	}
+
+	void addHyphens() {
+		System.out.print("          ");
+		for (int j = 0; j < 3; j++)
+			System.out.print("+-----");
+		System.out.println("+" + Constants.printingDelimiter);
 	}
 
 	/**
@@ -187,5 +216,12 @@ public class Board implements Constants {
 		for (int j = 0; j < 3; j++)
 			socketOut.print("|     ");
 		socketOut.println("|" + Constants.printingDelimiter);
+	}
+
+	void addSpaces() {
+		System.out.print("          ");
+		for (int j = 0; j < 3; j++)
+			System.out.print("|     ");
+		System.out.println("|" + Constants.printingDelimiter);
 	}
 }

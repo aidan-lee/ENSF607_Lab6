@@ -59,7 +59,8 @@ public class Player {
      * If neither have occurred, it passes the turn to the opposing player.
      */
     public void play() {
-        board.display(socketOut);
+//        board.display(socketOut);
+        board.display();
         makeMove();
 
         PrintWriter opponentSocket = opponent.getSocketOut();
@@ -97,6 +98,7 @@ public class Player {
         String colString;
 
         boolean invalidResponse = true;
+        PrintWriter opponentSocket = opponent.getSocketOut();
 
         while (invalidResponse) {
             try {
@@ -112,7 +114,13 @@ public class Player {
                     boolean isSpaceFilled = board.getMark(row, col) == Constants.SPACE_CHAR ? false : true;
                     if (!isSpaceFilled) {
                         board.addMark(row, col, this.mark);
-                        board.display(socketOut);
+//                        board.display(socketOut);
+                        socketOut.println(Constants.moveSuccess);
+
+                        // Send player's move to their opponent
+                        opponentSocket.println(mark + ":" + row + "," + col + ":" + Constants.opponentMove);
+
+
 
                         invalidResponse = false;
                     }
@@ -163,4 +171,7 @@ public class Player {
         return name;
     }
 
+    public char getMark() {
+        return mark;
+    }
 }
