@@ -81,7 +81,7 @@ public class Player {
 //            socketOut.println("Waiting for " + opponent.getName() + " to make their move." + Constants.waitingDelimiter);
 //            opponentSocket.println(name + " has made their move.  Your turn!" + Constants.printingDelimiter);
 
-            socketOut.println("Waiting for " + opponent.getName() + " to make their move" + Constants.turnIndicator);
+            socketOut.println("Waiting for " + opponent.getName() + "..." + Constants.turnIndicator);
             opponentSocket.println("Your turn!" + Constants.turnIndicator + Constants.yourTurn);
 
             opponent.play();

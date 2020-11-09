@@ -90,8 +90,8 @@ public class Game implements Constants, Runnable {
 
 			this.appointReferee(theRef);
 
-			socketOutX.println("Thank you for playing");
-			socketOutO.println("Thank you for playing");
+			socketOutX.println("Thank you for playing!" + Constants.turnIndicator);
+			socketOutO.println("Thank you for playing!" + Constants.turnIndicator);
 		}
 		catch (IOException e) {
     		e.printStackTrace();

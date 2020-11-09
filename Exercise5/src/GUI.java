@@ -61,7 +61,7 @@ public class GUI extends JFrame {
         messageBox.setRows(10);
         messageBox.setLineWrap(true);
 
-        turnIndicator = new JLabel();
+        turnIndicator = new JLabel(" ");
 
 
 
@@ -103,7 +103,7 @@ public class GUI extends JFrame {
 //                    socketOut.println(line);
                 }
                 else if (opponentMove(response)) {
-                    displayOppponentMove(response);
+                    displayOpponentMove(response);
                 }
                 else if (receivedMessage(response)) {
                     displayMessage(response);
@@ -202,7 +202,7 @@ public class GUI extends JFrame {
     }
 
     private void displayNameForm(String response) {
-
+        response = response.replaceAll(Constants.nameDelimiter, "");
         String name = JOptionPane.showInputDialog(response);
         playerName = name;
         socketOut.println(name);
@@ -239,21 +239,37 @@ public class GUI extends JFrame {
         mainWindow.getContentPane().removeAll();
         mainWindow.setLayout(new GridLayout(1, 2, 50, 50));
 
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+
         // Set up left panel, containing the board
         JPanel left = new JPanel();
 //        left.setLayout(new GridLayout());
-        JLabel nameLabel = new JLabel(playerName);
+        left.setLayout(new GridBagLayout());
+
+        JLabel nameLabel = new JLabel("Player name: " + playerName);
         nameLabel.setBounds(10,10, 100, 100);
-        left.add(nameLabel);
-        JLabel markLabel = new JLabel(mark);
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        left.add(nameLabel, constraints);
+        JLabel markLabel = new JLabel("Mark: " + mark);
         markLabel.setBounds(10,30, 100, 100);
-        left.add(markLabel);
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        left.add(markLabel, constraints);
 //        JLabel turnIndicator = new JLabel(turn);
 //        turnIndicator.setBounds(10,60, 100, 100);
-        left.add(turnIndicator);
+
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        constraints.ipady = 20;
+        left.add(turnIndicator, constraints);
         JPanel board = createBoard();
         board.setBounds(10, 70, 100, 100);
-        left.add(board);
+        constraints.gridx = 0;
+        constraints.gridy = 3;
+        constraints.ipady = 0;
+        left.add(board, constraints);
 
         // Set up right panel, containing the message box
         JPanel right = new JPanel();
@@ -262,8 +278,6 @@ public class GUI extends JFrame {
         //        right.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         right.setLayout(new GridBagLayout());
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel messageTitle = new JLabel("Message Window");
         messageTitle.setBounds(10,10, 100, 100);
@@ -332,10 +346,8 @@ public class GUI extends JFrame {
         }
     }
 
-    private void displayOppponentMove(String response) {
+    private void displayOpponentMove(String response) {
             String[] opponentMove = response.split(":");
-            System.out.println("opponent move length: " +opponentMove.length);
-            System.out.println(Arrays.toString(opponentMove));
             String mark = opponentMove[0];
             String coordinates = opponentMove[1];
 
@@ -349,6 +361,7 @@ public class GUI extends JFrame {
     }
 
     private void displayMessage(String response) {
+        response = response.replaceAll(Constants.messageIndicator, "");
         messageBox.setText(response);
     }
 
@@ -359,14 +372,16 @@ public class GUI extends JFrame {
 
     private void setTurn(String response) {
         response = response.replaceAll(Constants.turnIndicator, "");
-        turnIndicator.setText(response);
 
         if (response.contains(Constants.yourTurn)) {
+            response = response.replaceAll(Constants.yourTurn, "");
             setButtonsEnabled(true);
         }
         else {
             setButtonsEnabled(false);
         }
+
+        turnIndicator.setText(response);
     }
 
     private void setButtonsEnabled(boolean enabled) {
