@@ -68,6 +68,7 @@ public class Game implements Constants, Runnable {
 				name = socketInX.readLine();
 			}
 			xPlayer = new Player(name, LETTER_X, socketOutX, socketInX);
+			socketOutX.println(LETTER_X + Constants.markIndicator);
 			xPlayer.setBoard(this.theBoard);
 
 
@@ -79,6 +80,7 @@ public class Game implements Constants, Runnable {
 				name = socketInO.readLine();
 			}
 			oPlayer = new Player(name, LETTER_O, socketOutO, socketInO);
+			socketOutO.println(LETTER_O + Constants.markIndicator);
 			oPlayer.setBoard(this.theBoard);
 
 			theRef = new Referee();

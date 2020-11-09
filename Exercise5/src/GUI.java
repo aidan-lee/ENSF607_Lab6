@@ -105,6 +105,9 @@ public class GUI extends JFrame {
                 else if (receivedMessage(response)) {
                     displayMessage(response);
                 }
+                else if (receivedMark(response)) {
+                    setMark(response);
+                }
                 else {
                     displayGame(response);
                 }
@@ -173,6 +176,13 @@ public class GUI extends JFrame {
 
     private boolean receivedMessage(String response) {
         if (response.contains(Constants.messageIndicator)) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean receivedMark(String response) {
+        if (response.contains(Constants.markIndicator)) {
             return true;
         }
         return false;
@@ -327,6 +337,11 @@ public class GUI extends JFrame {
 
     private void displayMessage(String response) {
         messageBox.setText(response);
+    }
+
+    private void setMark(String response) {
+        response = response.replaceAll(Constants.markIndicator, "");
+        mark = response;
     }
 
     private void sendRowCol(JButton b) {

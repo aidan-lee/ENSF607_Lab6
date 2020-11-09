@@ -42,4 +42,6 @@ public interface Constants {
 	static final String opponentMove = "@OPPONENT_MOVE@";
 
 	static final String messageIndicator = "@DISPLAY_MESSAGE@";
+
+	static final String markIndicator = "@MARK_INDICATOR@";
 }
