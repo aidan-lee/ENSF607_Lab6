@@ -39,6 +39,7 @@ public class GUI extends JFrame {
 
     ArrayList<Pair<String, JButton>> buttons;
     JTextArea messageBox;
+    JLabel turnIndicator;
 
 
     public GUI(int w, int h, String serverName, int portNumber) {
@@ -59,6 +60,8 @@ public class GUI extends JFrame {
         messageBox.setColumns(20);
         messageBox.setRows(10);
         messageBox.setLineWrap(true);
+
+        turnIndicator = new JLabel();
 
 
 
@@ -107,6 +110,9 @@ public class GUI extends JFrame {
                 }
                 else if (receivedMark(response)) {
                     setMark(response);
+                }
+                else if (receivedTurn(response)) {
+                    setTurn(response);
                 }
                 else {
                     displayGame(response);
@@ -188,6 +194,13 @@ public class GUI extends JFrame {
         return false;
     }
 
+    private boolean receivedTurn(String response) {
+        if (response.contains(Constants.turnIndicator)) {
+            return true;
+        }
+        return false;
+    }
+
     private void displayNameForm(String response) {
 
         String name = JOptionPane.showInputDialog(response);
@@ -235,8 +248,8 @@ public class GUI extends JFrame {
         JLabel markLabel = new JLabel(mark);
         markLabel.setBounds(10,30, 100, 100);
         left.add(markLabel);
-        JLabel turnIndicator = new JLabel(turn);
-        turnIndicator.setBounds(10,60, 100, 100);
+//        JLabel turnIndicator = new JLabel(turn);
+//        turnIndicator.setBounds(10,60, 100, 100);
         left.add(turnIndicator);
         JPanel board = createBoard();
         board.setBounds(10, 70, 100, 100);
@@ -342,6 +355,27 @@ public class GUI extends JFrame {
     private void setMark(String response) {
         response = response.replaceAll(Constants.markIndicator, "");
         mark = response;
+    }
+
+    private void setTurn(String response) {
+        response = response.replaceAll(Constants.turnIndicator, "");
+        turnIndicator.setText(response);
+
+        if (response.contains(Constants.yourTurn)) {
+            setButtonsEnabled(true);
+        }
+        else {
+            setButtonsEnabled(false);
+        }
+    }
+
+    private void setButtonsEnabled(boolean enabled) {
+        for (Pair button : buttons) {
+            JButton b = (JButton)button.getValue();
+            if (b.getText().equals("")) {
+                b.setEnabled(enabled);
+            }
+        }
     }
 
     private void sendRowCol(JButton b) {

@@ -44,4 +44,10 @@ public interface Constants {
 	static final String messageIndicator = "@DISPLAY_MESSAGE@";
 
 	static final String markIndicator = "@MARK_INDICATOR@";
+
+	static final String turnIndicator = "@TURN_INDICATOR@";
+
+	static final String yourTurn = "@YOUR_TURN@";
+
+
 }

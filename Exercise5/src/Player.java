@@ -65,21 +65,25 @@ public class Player {
 
         PrintWriter opponentSocket = opponent.getSocketOut();
 
-        // send messages to other player too
-        if (board.isFull()) {
+
+        if (board.oWins() || board.xWins()) {
+            board.display(opponentSocket);
+            socketOut.println("The game is over.  " + this.name + " is the winner!" + Constants.messageIndicator);
+            opponentSocket.println("The game is over.  " + this.name + " is the winner!" + Constants.messageIndicator);
+        }
+        else if (board.isFull()) {
             board.display(opponentSocket);
             socketOut.println("The board is full, the game is over. It was a tie!" + Constants.messageIndicator);
             opponentSocket.println("The board is full, the game is over. It was a tie!" + Constants.messageIndicator);
 
         }
-        else if (board.oWins() || board.xWins()) {
-            board.display(opponentSocket);
-            socketOut.println("The game is over.  " + this.name + " is the winner!" + Constants.messageIndicator);
-            opponentSocket.println("The game is over.  " + this.name + " is the winner!" + Constants.messageIndicator);
-        }
         else {
-            socketOut.println("Waiting for " + opponent.getName() + " to make their move." + Constants.waitingDelimiter);
-            opponentSocket.println(name + " has made their move.  Your turn!" + Constants.printingDelimiter);
+//            socketOut.println("Waiting for " + opponent.getName() + " to make their move." + Constants.waitingDelimiter);
+//            opponentSocket.println(name + " has made their move.  Your turn!" + Constants.printingDelimiter);
+
+            socketOut.println("Waiting for " + opponent.getName() + " to make their move" + Constants.turnIndicator);
+            opponentSocket.println("Your turn!" + Constants.turnIndicator + Constants.yourTurn);
+
             opponent.play();
         }
     }
