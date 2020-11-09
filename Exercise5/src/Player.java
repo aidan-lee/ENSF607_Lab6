@@ -34,6 +34,8 @@ public class Player {
      */
     private BufferedReader socketIn;
 
+    GUI gui;
+
     /**
      * A constructor for Player objects
      * @param name The player's name
@@ -46,6 +48,9 @@ public class Player {
         this.mark = mark;
         this.socketIn = socketIn;
         this.socketOut = socketOut;
+//        this.gui = gui;
+
+//        gui = new GUI(500, 300);
     }
 
     /**

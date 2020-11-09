@@ -34,4 +34,6 @@ public interface Constants {
 	 * Defining a substring to indicate that a server response is waiting on a response from another client
 	 */
 	static final String waitingDelimiter = "@WAITING@";
+
+	static final String nameDelimiter = "@ENTER_NAME@";
 }

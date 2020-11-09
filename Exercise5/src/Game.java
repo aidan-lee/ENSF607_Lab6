@@ -60,24 +60,24 @@ public class Game implements Constants, Runnable {
     	try {
 			Referee theRef;
 			Player xPlayer, oPlayer;
-			socketOutX.println("Please enter the name of the \'X\' player:");
 
+			socketOutX.println("Please enter the name of the \'X\' player:" + Constants.nameDelimiter);
 			String name = socketInX.readLine();
 			while (name == null) {
 				socketOutX.print("Please try again: ");
 				name = socketInX.readLine();
 			}
-
 			xPlayer = new Player(name, LETTER_X, socketOutX, socketInX);
 			xPlayer.setBoard(this.theBoard);
 
-			socketOutO.println("Please enter the name of the \'O\' player:");
+
+//			GUI oGui = new GUI(500, 500);
+			socketOutO.println("Please enter the name of the \'O\' player:" + Constants.nameDelimiter);
 			name = socketInO.readLine();
 			while (name == null) {
 				socketOutO.print("Please try again: ");
 				name = socketInO.readLine();
 			}
-
 			oPlayer = new Player(name, LETTER_O, socketOutO, socketInO);
 			oPlayer.setBoard(this.theBoard);
 

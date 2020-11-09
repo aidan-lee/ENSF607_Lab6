@@ -1,4 +1,7 @@
+
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -6,10 +9,13 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-/**
- * Handles receiving and displaying messages from the server, and sending messages from the client back to the server
- */
-public class Client {
+public class GUI extends JFrame {
+
+    JFrame mainWindow;
+    int width;
+    int height;
+//    Board board;
+    Player player;
 
     // A socket
     private Socket socket;
@@ -23,12 +29,15 @@ public class Client {
     // Used to read user input from the console
     private BufferedReader stdIn;
 
-    /**
-     * Creates a Client object
-     * @param serverName name of the server
-     * @param portNumber port number the socket should listen on
-     */
-    public Client (String serverName, int portNumber) {
+    public GUI(int w, int h, String serverName, int portNumber) {
+        width = w;
+        height = h;
+
+        mainWindow = new JFrame();
+        mainWindow.setTitle("Tic Tac Toe");
+        mainWindow.setSize(width, height);
+        mainWindow.setVisible(true);
+
         try {
             socket = new Socket(serverName, portNumber);
             stdIn = new BufferedReader(new InputStreamReader (System.in));
@@ -43,34 +52,46 @@ public class Client {
         }
     }
 
-    /**
-     * Receives messages from the client and sends the user's input back, until it receives the message to stop.
-     */
-    public void communicate () {
+    public static String getPlayerName() {
+        String name = JOptionPane.showInputDialog("Please enter your name");
+        System.out.println("Your name is " + name);
+        return name;
+    }
+
+    public void communicate() {
         String line = "";
         String response = "";
 
         while (!line.equals("QUIT")) {
             try {
                 response = socketIn.readLine();
-                if (keepPrinting(response)) {
-                    getEntireResponse(response);
+                System.out.print(response);
+                if (waiting(response)) {
+                    displayWaiting(response);
                 }
-                else if (waiting(response)) {
-                    waitForResponse(response);
+                else if (requestName(response)) {
+                    displayNameForm(response);
+//                    line = stdIn.readLine();
+//                    System.out.println("Read " + line);
+//                    socketOut.println(line);
                 }
-                else {
-                    System.out.println(response);
-                }
-                line = stdIn.readLine();
-                socketOut.println(line);
+//                if (keepPrinting(response)) {
+//                    getEntireResponse(response);
+//                }
+//                else if (waiting(response)) {
+//                    waitForResponse(response);
+//                }
+//                else {
+//                    System.out.println(response);
+//                }
+//                line = stdIn.readLine();
+//                socketOut.println(line);
             }
             catch (IOException e) {
                 e.printStackTrace();
             }
         }
         closeSockets();
-
     }
 
     /**
@@ -109,7 +130,7 @@ public class Client {
                 response = socketIn.readLine();
             }
             if (keepPrinting(response)) {
-                getEntireResponse(response);
+                displayNameForm(response);
             }
         }
         catch (IOException e) {
@@ -141,6 +162,57 @@ public class Client {
         return false;
     }
 
+    private void displayWaiting(String response) {
+        mainWindow.getContentPane().removeAll();
+        response = response.replaceAll(Constants.waitingDelimiter, "");
+        JLabel waitingText = new JLabel(response);
+        waitingText.setBounds(10,10, 300, 30);
+        mainWindow.add(waitingText);
+        mainWindow.repaint();
+    }
+
+    private boolean requestName(String response) {
+        if (response.contains(Constants.nameDelimiter)) {
+            return true;
+        }
+        return false;
+    }
+
+    private void displayNameForm(String response) {
+
+        String name = JOptionPane.showInputDialog(response);
+        socketOut.println(name);
+
+
+
+
+//        mainWindow.getContentPane().removeAll();
+//        response = response.replaceAll(Constants.nameDelimiter, "");
+//        JLabel prompt = new JLabel(response);
+//        prompt.setBounds(10,10, 300, 30);
+//        mainWindow.add(prompt);
+//
+//        JTextField textField = new JTextField();
+//        textField.setBounds(30,30, 150,20);
+//        mainWindow.add(textField);
+//
+//        JButton submitName = new JButton("Find IP");
+//        submitName.setBounds(50,150,95,30);
+//        submitName.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                String name = textField.getText();
+//                socketOut.println(name);
+//
+////                mainWindow.getContentPane().removeAll();
+////                mainWindow.repaint();
+//                return;
+//            }
+//        });
+//        mainWindow.add(submitName);
+//        mainWindow.repaint();
+    }
+
     /**
      * Closes sockets to terminate server connection.
      */
@@ -155,15 +227,9 @@ public class Client {
         }
     }
 
-
-
-    /**
-     * Creates a Client object and initiates a connection to the server
-     * @param args
-     */
     public static void main (String [] args) {
-        Client client = new Client ("localhost", 9000);
-//        client.communicate();
+        GUI client = new GUI (500, 300, "localhost", 9000);
+        client.communicate();
     }
 
 }

@@ -72,12 +72,14 @@ public class Server {
         try {
             while (true) {
                 socketX = serverSocket.accept();
+
                 System.out.println("Client connection accepted by the server!");
                 socketInX = new BufferedReader(new InputStreamReader(socketX.getInputStream()));
                 socketOutX = new PrintWriter(socketX.getOutputStream(), true);
+                socketOutX.println("Waiting for another player to connect" + Constants.waitingDelimiter);
 
-                System.out.println("Client connection accepted by the server!");
                 socketO = serverSocket.accept();
+                System.out.println("Client connection accepted by the server!");
                 socketInO = new BufferedReader(new InputStreamReader(socketO.getInputStream()));
                 socketOutO = new PrintWriter(socketO.getOutputStream(), true);
 
