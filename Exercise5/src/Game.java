@@ -31,7 +31,6 @@ public class Game implements Constants, Runnable {
 		this.socketOutX = socketOut1;
 		this.socketInO = socketIn2;
 		this.socketOutO = socketOut2;
-
 	}
 
 	/**
@@ -43,12 +42,6 @@ public class Game implements Constants, Runnable {
         theRef = r;
     	theRef.runTheGame();
     }
-
-	/**
-
-	 * @param args
-	 * @throws IOException
-	 */
 
 	/**
 	 * The driver of the tic-tac-toe game.

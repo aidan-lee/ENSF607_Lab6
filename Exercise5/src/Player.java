@@ -34,8 +34,6 @@ public class Player {
      */
     private BufferedReader socketIn;
 
-    GUI gui;
-
     /**
      * A constructor for Player objects
      * @param name The player's name
@@ -48,9 +46,6 @@ public class Player {
         this.mark = mark;
         this.socketIn = socketIn;
         this.socketOut = socketOut;
-//        this.gui = gui;
-
-//        gui = new GUI(500, 300);
     }
 
     /**
@@ -59,31 +54,22 @@ public class Player {
      * If neither have occurred, it passes the turn to the opposing player.
      */
     public void play() {
-//        board.display(socketOut);
-        board.display();
+        socketOut.println("Your turn!" + Constants.turnIndicator + Constants.yourTurn);
         makeMove();
 
         PrintWriter opponentSocket = opponent.getSocketOut();
 
-
         if (board.oWins() || board.xWins()) {
-            board.display(opponentSocket);
             socketOut.println("The game is over.  " + this.name + " is the winner!" + Constants.messageIndicator);
             opponentSocket.println("The game is over.  " + this.name + " is the winner!" + Constants.messageIndicator);
         }
         else if (board.isFull()) {
-            board.display(opponentSocket);
             socketOut.println("The board is full, the game is over. It was a tie!" + Constants.messageIndicator);
             opponentSocket.println("The board is full, the game is over. It was a tie!" + Constants.messageIndicator);
 
         }
         else {
-//            socketOut.println("Waiting for " + opponent.getName() + " to make their move." + Constants.waitingDelimiter);
-//            opponentSocket.println(name + " has made their move.  Your turn!" + Constants.printingDelimiter);
-
             socketOut.println("Waiting for " + opponent.getName() + "..." + Constants.turnIndicator);
-            opponentSocket.println("Your turn!" + Constants.turnIndicator + Constants.yourTurn);
-
             opponent.play();
         }
     }
@@ -118,7 +104,6 @@ public class Player {
                     boolean isSpaceFilled = board.getMark(row, col) == Constants.SPACE_CHAR ? false : true;
                     if (!isSpaceFilled) {
                         board.addMark(row, col, this.mark);
-//                        board.display(socketOut);
                         socketOut.println(Constants.moveSuccess);
 
                         // Send player's move to their opponent

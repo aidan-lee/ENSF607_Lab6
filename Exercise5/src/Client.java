@@ -163,7 +163,7 @@ public class Client {
      */
     public static void main (String [] args) {
         Client client = new Client ("localhost", 9000);
-//        client.communicate();
+        client.communicate();
     }
 
 }

@@ -12,48 +12,92 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class GUI extends JFrame {
 
+    /**
+     * The main window of the GUI. Contains the tic tac toe board
+     */
     JFrame mainWindow;
+
+    /**
+     * Width of the main window
+     */
     int width;
+
+    /**
+     * Height of the main window
+     */
     int height;
-//    Board board;
-//    Player player;
 
+    /**
+     * An array of JButtons, representing the spaces in the tic tac toe grid
+     */
+    ArrayList<Pair<String, JButton>> buttons;
+
+    /**
+     * A JTextArea, used to display messages from the server
+     */
+    JTextArea messageBox;
+
+    /**
+     * A JLabel, used to display turn information
+     */
+    JLabel turnIndicator;
+
+    /**
+     * The name of the player using the GUI
+     */
     String playerName;
-    String mark = Character.toString(Constants.LETTER_X);
 
-    // A socket
+    /**
+     * The mark of the player using the GUI
+     */
+    String mark;
+
+    /**
+     * A socket
+     */
     private Socket socket;
 
-    // Socket used to write to the server
+    /**
+     * Socket used to write to the server
+     */
     private PrintWriter socketOut;
 
-    // Socket used to receive messages from the server
+    /**
+     * Socket used to receive messages from the server
+     */
     private BufferedReader socketIn;
 
     // Used to read user input from the console
+    /**
+     * Used to read user input from the console
+     */
     private BufferedReader stdIn;
 
-    ArrayList<Pair<String, JButton>> buttons;
-    JTextArea messageBox;
-    JLabel turnIndicator;
-
-
+    /**
+     * Constructs a GUI object
+     * @param w the width of the main window
+     * @param h the height of the main window
+     * @param serverName the name of the server to connect to
+     * @param portNumber the port to listen on
+     */
     public GUI(int w, int h, String serverName, int portNumber) {
         width = w;
         height = h;
 
+        // Setting up the main window
         mainWindow = new JFrame();
         mainWindow.setTitle("Tic Tac Toe");
         mainWindow.setSize(width, height);
         mainWindow.setVisible(true);
 
+        // Creating the tic tac toe grid
         buttons = new ArrayList<>();
         createButtons();
 
+        // Setting up the message box
         messageBox = new JTextArea();
         messageBox.setEditable(false);
         messageBox.setBounds(10,50, 100, 100);
@@ -61,10 +105,10 @@ public class GUI extends JFrame {
         messageBox.setRows(10);
         messageBox.setLineWrap(true);
 
+        // Setting up the turn label
         turnIndicator = new JLabel(" ");
 
-
-
+        // Set up sockets
         try {
             socket = new Socket(serverName, portNumber);
             stdIn = new BufferedReader(new InputStreamReader (System.in));
@@ -79,12 +123,9 @@ public class GUI extends JFrame {
         }
     }
 
-    public static String getPlayerName() {
-        String name = JOptionPane.showInputDialog("Please enter your name");
-        System.out.println("Your name is " + name);
-        return name;
-    }
-
+    /**
+     * Receives messages from the client and sends the user's input back, until it receives the message to stop.
+     */
     public void communicate() {
         String line = "";
         String response = "";
@@ -92,42 +133,35 @@ public class GUI extends JFrame {
         while (!line.equals("QUIT")) {
             try {
                 response = socketIn.readLine();
-                System.out.print(response);
                 if (waiting(response)) {
+                    // Display waiting panel
                     displayWaiting(response);
                 }
                 else if (requestName(response)) {
+                    // Launch popup to get name
                     displayNameForm(response);
-//                    line = stdIn.readLine();
-//                    System.out.println("Read " + line);
-//                    socketOut.println(line);
                 }
                 else if (opponentMove(response)) {
+                    // Update the tic tac toe board with the oppoent's move
                     displayOpponentMove(response);
                 }
                 else if (receivedMessage(response)) {
+                    // Display the message from the server in the message window
                     displayMessage(response);
                 }
                 else if (receivedMark(response)) {
+                    // Sets the player's mark
                     setMark(response);
                 }
                 else if (receivedTurn(response)) {
+                    // Sets the turn indicator message, and enables or disables the grid buttons,
+                    // depending on whether or not it is the player's turn
                     setTurn(response);
                 }
                 else {
-                    displayGame(response);
+                    // Show the main window
+                    displayGame();
                 }
-//                if (keepPrinting(response)) {
-//                    getEntireResponse(response);
-//                }
-//                else if (waiting(response)) {
-//                    waitForResponse(response);
-//                }
-//                else {
-//                    System.out.println(response);
-//                }
-//                line = stdIn.readLine();
-//                socketOut.println(line);
             }
             catch (IOException e) {
                 e.printStackTrace();
@@ -135,7 +169,6 @@ public class GUI extends JFrame {
         }
         closeSockets();
     }
-
 
     /**
      * Looks for the waitingDelimiter substring in a server response
@@ -149,6 +182,10 @@ public class GUI extends JFrame {
         return false;
     }
 
+    /**
+     * Adds a JLabel to the main window to display the message from the server
+     * @param response the response from the server
+     */
     private void displayWaiting(String response) {
         mainWindow.getContentPane().removeAll();
         response = response.replaceAll(Constants.waitingDelimiter, "");
@@ -158,6 +195,11 @@ public class GUI extends JFrame {
         mainWindow.repaint();
     }
 
+    /**
+     * Determines whether or not a server response contains the Constants.nameDelimiter substring
+     * @param response the response from the server
+     * @return true if substring found, false otherwise
+     */
     private boolean requestName(String response) {
         if (response.contains(Constants.nameDelimiter)) {
             return true;
@@ -165,6 +207,11 @@ public class GUI extends JFrame {
         return false;
     }
 
+    /**
+     * Determines whether or not a server response contains the Constants.moveSuccess substring
+     * @param response the response from the server
+     * @return true if substring found, false otherwise
+     */
     private boolean moveSuccess(String response) {
         if (response.contains(Constants.moveSuccess)) {
             return true;
@@ -172,6 +219,11 @@ public class GUI extends JFrame {
         return false;
     }
 
+    /**
+     * Determines whether or not a server response contains the Constants.opponentMove substring
+     * @param response the response from the server
+     * @return true if substring found, false otherwise
+     */
     private boolean opponentMove(String response) {
         if (response.contains(Constants.opponentMove)) {
             return true;
@@ -179,7 +231,11 @@ public class GUI extends JFrame {
         return false;
     }
 
-
+    /**
+     * Determines whether or not a server response contains the Constants.messageIndicator substring
+     * @param response the response from the server
+     * @return true if substring found, false otherwise
+     */
     private boolean receivedMessage(String response) {
         if (response.contains(Constants.messageIndicator)) {
             return true;
@@ -187,6 +243,11 @@ public class GUI extends JFrame {
         return false;
     }
 
+    /**
+     * Determines whether or not a server response contains the Constants.markIndicator substring
+     * @param response the response from the server
+     * @return true if substring found, false otherwise
+     */
     private boolean receivedMark(String response) {
         if (response.contains(Constants.markIndicator)) {
             return true;
@@ -194,6 +255,11 @@ public class GUI extends JFrame {
         return false;
     }
 
+    /**
+     * Determines whether or not a server response contains the Constants.turnIndicator substring
+     * @param response the response from the server
+     * @return true if substring found, false otherwise
+     */
     private boolean receivedTurn(String response) {
         if (response.contains(Constants.turnIndicator)) {
             return true;
@@ -201,41 +267,21 @@ public class GUI extends JFrame {
         return false;
     }
 
+    /**
+     * Open a input dialogue to prompt the user to enter their name
+     * @param response the prompt from the server
+     */
     private void displayNameForm(String response) {
         response = response.replaceAll(Constants.nameDelimiter, "");
         String name = JOptionPane.showInputDialog(response);
         playerName = name;
         socketOut.println(name);
-
-
-//        mainWindow.getContentPane().removeAll();
-//        response = response.replaceAll(Constants.nameDelimiter, "");
-//        JLabel prompt = new JLabel(response);
-//        prompt.setBounds(10,10, 300, 30);
-//        mainWindow.add(prompt);
-//
-//        JTextField textField = new JTextField();
-//        textField.setBounds(30,30, 150,20);
-//        mainWindow.add(textField);
-//
-//        JButton submitName = new JButton("Find IP");
-//        submitName.setBounds(50,150,95,30);
-//        submitName.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                String name = textField.getText();
-//                socketOut.println(name);
-//
-////                mainWindow.getContentPane().removeAll();
-////                mainWindow.repaint();
-//                return;
-//            }
-//        });
-//        mainWindow.add(submitName);
-//        mainWindow.repaint();
     }
 
-    private void displayGame(String turn) {
+    /**
+     * Display the main window, with a tic tac toe board and a message window
+     */
+    private void displayGame() {
         mainWindow.getContentPane().removeAll();
         mainWindow.setLayout(new GridLayout(1, 2, 50, 50));
 
@@ -244,7 +290,6 @@ public class GUI extends JFrame {
 
         // Set up left panel, containing the board
         JPanel left = new JPanel();
-//        left.setLayout(new GridLayout());
         left.setLayout(new GridBagLayout());
 
         JLabel nameLabel = new JLabel("Player name: " + playerName);
@@ -257,8 +302,6 @@ public class GUI extends JFrame {
         constraints.gridx = 0;
         constraints.gridy = 1;
         left.add(markLabel, constraints);
-//        JLabel turnIndicator = new JLabel(turn);
-//        turnIndicator.setBounds(10,60, 100, 100);
 
         constraints.gridx = 0;
         constraints.gridy = 2;
@@ -273,10 +316,6 @@ public class GUI extends JFrame {
 
         // Set up right panel, containing the message box
         JPanel right = new JPanel();
-//        right.setLayout(new GridLayout(2, 1));
-//        right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
-        //        right.setAlignmentX(Component.CENTER_ALIGNMENT);
-
         right.setLayout(new GridBagLayout());
 
         JLabel messageTitle = new JLabel("Message Window");
@@ -284,8 +323,6 @@ public class GUI extends JFrame {
         constraints.gridx = 0;
         constraints.gridy = 0;
         right.add(messageTitle, constraints);
-//        pane.add(button, c);
-//        right.add(messageTitle);
         constraints.gridx = 0;
         constraints.gridy = 1;
         right.add(messageBox, constraints);
@@ -294,29 +331,32 @@ public class GUI extends JFrame {
         mainWindow.add(right);
         mainWindow.repaint();
         mainWindow.setVisible(true);
-
     }
 
+    /**
+     * Creates the tic tac toe board to display
+     * @return
+     */
     private JPanel createBoard() {
-        System.out.println("creating board");
         JPanel board = new JPanel();
         board.setLayout(new GridLayout(Constants.ROW_MAX, Constants.COL_MAX));
-//        JButton b1 = new JButton();
-
         populateButtons(board);
-
-//        int buttonNum = Constants.ROW_MAX * Constants.COL_MAX;
-
-
         return board;
     }
 
+    /**
+     * Attaches the buttons from the button array to a JPanel for display
+     * @param board the JPanel to display
+     */
     private void populateButtons(JPanel board) {
         for (int i = 0; i < buttons.size(); i++) {
             board.add(buttons.get(i).getValue());
         }
     }
 
+    /**
+     * Creates ROW_MAX * COL_MAX buttons to act as the tic tac toe grid
+     */
     private void createButtons() {
         for (int i = 0; i < Constants.ROW_MAX; i++) {
             for (int j = 0; j < Constants.COL_MAX; j++) {
@@ -327,11 +367,13 @@ public class GUI extends JFrame {
                 b.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
+                        // Send the move to the server
                         sendRowCol(b);
 
                         try {
                             String response = socketIn.readLine();
                             if (moveSuccess(response)) {
+                                // Mark the button and disable it
                                 b.setText(mark);
                                 b.setEnabled(false);
                             }
@@ -339,13 +381,16 @@ public class GUI extends JFrame {
                         catch (IOException ex) {
                             ex.printStackTrace();
                         }
-
                     }
                 });
             }
         }
     }
 
+    /**
+     * Parses the message from the server and updates the tic tac toe button array to reflect the opponent's move
+     * @param response the response from the server
+     */
     private void displayOpponentMove(String response) {
             String[] opponentMove = response.split(":");
             String mark = opponentMove[0];
@@ -360,16 +405,29 @@ public class GUI extends JFrame {
             }
     }
 
+    /**
+     * Displays the message from the server in the GUI's message window
+     * @param response the response from the server
+     */
     private void displayMessage(String response) {
         response = response.replaceAll(Constants.messageIndicator, "");
         messageBox.setText(response);
     }
 
+    /**
+     * Sets the mark member variable to the contents of the server's message
+     * @param response the response from the server
+     */
     private void setMark(String response) {
         response = response.replaceAll(Constants.markIndicator, "");
         mark = response;
     }
 
+    /**
+     * Displays the turn indicator, and enables or disables the tic tac toe buttons,
+     * depending on whether or not it is the player's turn
+     * @param response
+     */
     private void setTurn(String response) {
         response = response.replaceAll(Constants.turnIndicator, "");
 
@@ -384,6 +442,10 @@ public class GUI extends JFrame {
         turnIndicator.setText(response);
     }
 
+    /**
+     * Sets the enabled status of all buttons without a mark
+     * @param enabled whether or not the buttons should be enabled
+     */
     private void setButtonsEnabled(boolean enabled) {
         for (Pair button : buttons) {
             JButton b = (JButton)button.getValue();
@@ -393,6 +455,10 @@ public class GUI extends JFrame {
         }
     }
 
+    /**
+     * Send the coordinates of the player's move to the server
+     * @param b the button that was pressed
+     */
     private void sendRowCol(JButton b) {
         for (Pair buttonPair : buttons) {
             if (buttonPair.getValue().equals(b)) {
@@ -422,9 +488,12 @@ public class GUI extends JFrame {
         }
     }
 
+    /**
+     * Creates a GUI object and initiates a connection to the server
+     * @param args
+     */
     public static void main (String [] args) {
         GUI client = new GUI (500, 300, "localhost", 9000);
         client.communicate();
     }
-
 }

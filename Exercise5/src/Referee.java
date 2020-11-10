@@ -31,7 +31,7 @@ public class Referee {
         xPlayer.setOpponent(oPlayer);
         oPlayer.setOpponent(xPlayer);
 
-//        board.display(xPlayer.getSocketOut());
+        oPlayer.getSocketOut().println("Waiting for other player..." + Constants.waitingDelimiter);
         xPlayer.play();
     }
 
