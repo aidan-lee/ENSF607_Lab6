@@ -100,10 +100,10 @@ public class GUI extends JFrame {
         // Setting up the message box
         messageBox = new JTextArea();
         messageBox.setEditable(false);
-        messageBox.setBounds(10,50, 100, 100);
-        messageBox.setColumns(20);
+        messageBox.setColumns(18);
         messageBox.setRows(10);
         messageBox.setLineWrap(true);
+        messageBox.setWrapStyleWord(true);
 
         // Setting up the turn label
         turnIndicator = new JLabel(" ");

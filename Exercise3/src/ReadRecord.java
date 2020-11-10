@@ -14,9 +14,8 @@ public class ReadRecord {
     private ObjectInputStream input;
     
     /**
-     *  opens an ObjectInputStream using a FileInputStream
+     *  opens an ObjectInputStream using a FileInputStream, and prints the contents to the console
      */
-    
     private void readObjectsFromFile(String name)
     {
         MusicRecord record;
@@ -62,8 +61,11 @@ public class ReadRecord {
             System.err.println("No class MusicRecord found");
         }
     }           // END OF METHOD 
-    
-    
+
+    /**
+     * Creates a new ReadRecord object and reads from the specified file
+     * @param args
+     */
     public static void main(String [] args)
     {
         ReadRecord d = new ReadRecord();
