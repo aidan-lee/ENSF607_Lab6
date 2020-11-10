@@ -55,6 +55,7 @@ public class ReadRecord {
             System.out.println("Finished reading file");
         }
         catch (IOException ioEx) {
+            ioEx.printStackTrace();
             System.err.println("Error reading from file");
         }
         catch (ClassNotFoundException classEx) {
@@ -66,6 +67,6 @@ public class ReadRecord {
     public static void main(String [] args)
     {
         ReadRecord d = new ReadRecord();
-        d.readObjectsFromFile("mySongs.ser");
+        d.readObjectsFromFile("allSongs.ser");
     }
 }
